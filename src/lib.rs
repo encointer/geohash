@@ -1,5 +1,4 @@
 #![doc(html_root_url = "https://docs.rs/geohash/")]
-
 //! # Geohash
 //!
 //! Geohash algorithm implementation in Rust. It encodes/decodes a
@@ -10,36 +9,33 @@
 //! ```rust
 //! extern crate geohash;
 //!
-//! use std::error::Error;
+//! use geohash::{encode, decode, neighbor, Direction};
+//! use fixed::types::I64F64;
 //!
-//! use geohash::{encode, decode, neighbor, Direction, Coordinate};
-//!
-//! fn main() -> Result<(), Box<Error>> {
-//!   // encode a coordinate
-//!   let c = Coordinate { x: 112.5584f64, y: 37.8324f64 };
-//!   println!("encoding 37.8324, 112.5584: {}", encode(c, 9usize)?);
+//! fn main() -> Result<(), Box<geohash::GeohashError>> {
+//!   let lon = I64F64::from_num(112.5584);
+//!   let lat = I64F64::from_num(37.8324f64);
 //!
 //!   // decode a geohash
-//!   let (c, _, _) = decode("ww8p1r4t8")?;
-//!   println!("decoding ww8p1r4t8 to: {}, {}", c.y, c.x);
+//!   let (lon, lat, _, _) = decode(&String::from("ww8p1r4t8"))?;
 //!
 //!   // find a neighboring hash
-//!   let sw = neighbor("ww8p1r4t8", Direction::SW)?;
+//!   let sw = neighbor(&String::from("ww8p1r4t8"), Direction::SW)?;
 //!
 //!   Ok(())
 //! }
 //! ```
 //!
+//!
+#![no_std]
+extern crate alloc;
+pub use alloc::string::String;
 
-extern crate geo_types;
-#[cfg(test)]
-extern crate num_traits;
 
 mod core;
 mod error;
 mod neighbors;
 
-pub use crate::core::{decode, decode_bbox, encode, neighbor, neighbors};
+pub use crate::core::{decode, encode, neighbor, neighbors};
 pub use crate::error::GeohashError;
 pub use crate::neighbors::{Direction, Neighbors};
-pub use geo_types::{Coordinate, Rect};
