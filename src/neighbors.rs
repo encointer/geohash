@@ -1,16 +1,16 @@
 use fixed::types::I64F64;
-use crate::String;
+use crate::GeoHash;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Neighbors {
-    pub sw: String,
-    pub s: String,
-    pub se: String,
-    pub w: String,
-    pub e: String,
-    pub nw: String,
-    pub n: String,
-    pub ne: String,
+    pub sw: GeoHash,
+    pub s: GeoHash,
+    pub se: GeoHash,
+    pub w: GeoHash,
+    pub e: GeoHash,
+    pub nw: GeoHash,
+    pub n: GeoHash,
+    pub ne: GeoHash,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

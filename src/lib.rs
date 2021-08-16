@@ -13,23 +13,38 @@
 //! use fixed::types::I64F64;
 //!
 //! fn main() -> Result<(), Box<geohash::GeohashError>> {
-//!   let lon = I64F64::from_num(112.5584);
+//!   use geohash::GeoHash;
+//! let lon = I64F64::from_num(112.5584);
 //!   let lat = I64F64::from_num(37.8324f64);
 //!
 //!   // decode a geohash
-//!   let (lon, lat, _, _) = decode(&String::from("ww8p1r4t8"))?;
+//!   let (lon, lat, _, _) = decode(&GeoHash("ww8p1r4t8".as_bytes().to_vec()))?;
 //!
 //!   // find a neighboring hash
-//!   let sw = neighbor(&String::from("ww8p1r4t8"), Direction::SW)?;
+//!   let sw = neighbor(&GeoHash("ww8p1r4t8".as_bytes().to_vec()), Direction::SW)?;
 //!
 //!   Ok(())
 //! }
 //! ```
 //!
 //!
+//!
 #![no_std]
+use codec::{Decode, Encode};
+use ::core::ops::Deref;
 extern crate alloc;
-pub use alloc::string::String;
+
+
+#[derive(Encode, Decode, Eq, PartialEq, Clone, Debug)]
+pub struct GeoHash(pub Vec<u8>);
+
+impl Deref for GeoHash {
+    type Target = Vec<u8>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
 
 
 mod core;
@@ -39,3 +54,4 @@ mod neighbors;
 pub use crate::core::{decode, encode, neighbor, neighbors};
 pub use crate::error::GeohashError;
 pub use crate::neighbors::{Direction, Neighbors};
+use alloc::vec::Vec;
