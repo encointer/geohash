@@ -38,7 +38,7 @@ use alloc::vec::Vec;
 use codec::{Decode, Encode};
 use fixed::types::I64F64;
 
-use crate::core::{decode, encode, neighbor, neighbors};
+use crate::core::{try_as_coordinates, try_from_params, neighbor, neighbors};
 pub use crate::error::GeohashError;
 pub use crate::neighbors::{Direction, Neighbors};
 
@@ -56,10 +56,10 @@ impl Deref for GeoHash {
 
 impl GeoHash {
     pub fn try_from_params(lat: I64F64, lon: I64F64, len: usize) -> Result<GeoHash, GeohashError> {
-        encode(lat, lon, len)
+        try_from_params(lat, lon, len)
     }
     pub fn try_as_coordinates(&self) -> Result<(I64F64, I64F64, I64F64, I64F64), GeohashError> {
-        decode(self)
+        try_as_coordinates(self)
     }
     pub fn neighbors(&self) -> Result<Neighbors, GeohashError> {
         neighbors(self)

@@ -50,7 +50,7 @@ static BASE32_CODES: &[char] = &[
 ///
 /// assert_eq!(geohash_string, GeoHash("9q60y60rhs".as_bytes().to_vec()));
 /// ```
-pub(crate) fn encode(lat: I64F64, lon: I64F64, len: usize) -> Result<GeoHash, GeohashError> {
+pub(crate) fn try_from_params(lat: I64F64, lon: I64F64, len: usize) -> Result<GeoHash, GeohashError> {
     let mut out = Vec::with_capacity(len);
 
     let mut bits_total: i8 = 0;
@@ -213,7 +213,7 @@ fn hash_value_of_char(c: char) -> Result<usize, GeohashError> {
 ///     ),
 /// );
 /// ```
-pub(crate) fn decode(hash_str: &GeoHash) -> Result<(I64F64, I64F64, I64F64, I64F64), GeohashError> {
+pub(crate) fn try_as_coordinates(hash_str: &GeoHash) -> Result<(I64F64, I64F64, I64F64, I64F64), GeohashError> {
     let rect = decode_bbox(hash_str)?;
     let c0 = rect.min;
     let c1 = rect.max;
@@ -228,12 +228,12 @@ pub(crate) fn decode(hash_str: &GeoHash) -> Result<(I64F64, I64F64, I64F64, I64F
 
 /// Find neighboring geohashes for the given geohash and direction.
 pub(crate) fn neighbor(hash_str: &GeoHash, direction: Direction) -> Result<GeoHash, GeohashError> {
-    let (lon, lat, lon_err, lat_err) = decode(hash_str)?;
+    let (lon, lat, lon_err, lat_err) = try_as_coordinates(hash_str)?;
     let (dlat, dlng) = direction.to_tuple();
     let two = I64F64::from_num(2);
     let neighbor_lon = lon + two * lon_err.abs() * dlng;
     let neighbor_lat = lat + two * lat_err.abs() * dlat;
-    encode(neighbor_lat, neighbor_lon, hash_str.len())
+    try_from_params(neighbor_lat, neighbor_lon, hash_str.len())
 }
 
 /// Find all neighboring geohashes for the given geohash.
