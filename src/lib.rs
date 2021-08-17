@@ -17,10 +17,10 @@
 //!   let lat = I64F64::from_num(37.8324f64);
 //!
 //!   // decode a geohash
-//!   let (lon, lat, _, _) = GeoHash("ww8p1r4t8".as_bytes().to_vec()).try_as_coordinates()?;
+//!   let (lon, lat, _, _) = GeoHash::from("ww8p1r4t8").try_as_coordinates()?;
 //!
 //!   // find a neighboring hash
-//!   let sw = GeoHash("ww8p1r4t8".as_bytes().to_vec()).neighbor(Direction::SW)?;
+//!   let sw = GeoHash::from("ww8p1r4t8").neighbor(Direction::SW)?;
 //!
 //!   Ok(())
 //! }
@@ -70,6 +70,12 @@ impl Deref for GeoHash {
     }
 }
 
+impl From<&str> for GeoHash {
+    fn from(s: &str) -> Self {
+        GeoHash(s.as_bytes().to_vec())
+    }
+}
+
 impl GeoHash {
     /// Internal function to encode a coordinate to a geohash with length `len`.
     ///
@@ -83,7 +89,7 @@ impl GeoHash {
     /// let lon = I64F64::from_num(-120.6623);
     /// let lat = I64F64::from_num(35.3003);
     /// let geohash_string = GeoHash::try_from_params(lat, lon, 5).expect("Invalid coordinate");
-    /// assert_eq!(geohash_string, GeoHash("9q60y".as_bytes().to_vec()));
+    /// assert_eq!(geohash_string, GeoHash::from("9q60y"));
     /// ```
     ///
     /// Encoding a coordinate to a length ten geohash:
@@ -95,7 +101,7 @@ impl GeoHash {
     /// let lat = I64F64::from_num(35.3003);
     /// let geohash_string = GeoHash::try_from_params(lat, lon, 10).expect("Invalid coordinate");
     ///
-    /// assert_eq!(geohash_string, GeoHash("9q60y60rhs".as_bytes().to_vec()));
+    /// assert_eq!(geohash_string, GeoHash::from("9q60y60rhs"));
     /// ```
     pub fn try_from_params(lat: I64F64, lon: I64F64, len: usize) -> Result<GeoHash, GeohashError> {
         let mut out = Vec::with_capacity(len);
@@ -230,7 +236,7 @@ impl GeoHash {
     /// ```rust
     /// use fixed::types::I64F64;
     /// use geohash::GeoHash;
-    /// let geohash_str = GeoHash("9q60y".as_bytes().to_vec());
+    /// let geohash_str = GeoHash::from("9q60y");
     /// let decoded = geohash_str.try_as_coordinates().expect("Invalid hash string");
     /// assert_eq!(
     ///     decoded,
@@ -248,7 +254,7 @@ impl GeoHash {
     /// ```rust
     /// use fixed::types::I64F64;
     /// use geohash::GeoHash;
-    /// let geohash_str = GeoHash("9q60y60rhs".as_bytes().to_vec());
+    /// let geohash_str = GeoHash::from("9q60y60rhs");
     /// let decoded = geohash_str.try_as_coordinates().expect("Invalid hash string");
     /// assert_eq!(
     ///     decoded,
@@ -289,21 +295,21 @@ impl GeoHash {
     ///
     /// ```
     /// use geohash::GeoHash;
-    /// let geohash_str = GeoHash("9q60y60rhs".as_bytes().to_vec());
+    /// let geohash_str = GeoHash::from("9q60y60rhs");
     ///
     /// let neighbors = geohash_str.neighbors().expect("Invalid hash string");
     ///
     /// assert_eq!(
     ///     neighbors,
     ///     geohash::Neighbors {
-    ///         n: GeoHash("9q60y60rht".as_bytes().to_vec()),
-    ///         ne: GeoHash("9q60y60rhv".as_bytes().to_vec()),
-    ///         e: GeoHash("9q60y60rhu".as_bytes().to_vec()),
-    ///         se: GeoHash("9q60y60rhg".as_bytes().to_vec()),
-    ///         s: GeoHash("9q60y60rhe".as_bytes().to_vec()),
-    ///         sw: GeoHash("9q60y60rh7".as_bytes().to_vec()),
-    ///         w: GeoHash("9q60y60rhk".as_bytes().to_vec()),
-    ///         nw: GeoHash("9q60y60rhm".as_bytes().to_vec()),
+    ///         n: GeoHash::from("9q60y60rht"),
+    ///         ne: GeoHash::from("9q60y60rhv"),
+    ///         e: GeoHash::from("9q60y60rhu"),
+    ///         se: GeoHash::from("9q60y60rhg"),
+    ///         s: GeoHash::from("9q60y60rhe"),
+    ///         sw: GeoHash::from("9q60y60rh7"),
+    ///         w: GeoHash::from("9q60y60rhk"),
+    ///         nw: GeoHash::from("9q60y60rhm"),
     ///     }
     /// );
     /// ```
