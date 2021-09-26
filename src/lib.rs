@@ -37,6 +37,7 @@ use alloc::vec::Vec;
 
 use codec::{Decode, Encode};
 use fixed::types::I64F64;
+use serde::{Deserialize, Serialize};
 
 pub use crate::error::GeohashError;
 pub use crate::neighbors::{Direction, Neighbors};
@@ -59,7 +60,7 @@ static BASE32_CODES: &[char] = &[
     'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 ];
 
-#[derive(Encode, Decode, Eq, PartialEq, Clone, Debug, Ord, PartialOrd)]
+#[derive(Encode, Decode, Eq, PartialEq, Clone, Debug, Ord, PartialOrd, Serialize, Deserialize)]
 pub struct GeoHash(pub Vec<u8>);
 
 impl Deref for GeoHash {
