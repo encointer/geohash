@@ -59,7 +59,7 @@ static BASE32_CODES: &[char] = &[
     'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 ];
 
-#[derive(Encode, Decode, Eq, PartialEq, Clone, Debug, Ord, PartialOrd)]
+#[derive(Encode, Decode, Eq, PartialEq, Clone, Debug, Ord, PartialOrd, scale_info::TypeInfo)]
 pub struct GeoHash(pub Vec<u8>);
 
 impl Deref for GeoHash {
