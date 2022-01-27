@@ -74,6 +74,9 @@ impl<const LEN: usize> TryFrom<&str> for GeoHash<LEN> {
     type Error = GeohashError;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
+        if value.len() != LEN {
+            return Err(GeohashError::InvalidLen);
+        }
         // `try_from` is only successful if the input is a valid base 32 encoded geo hash.
 
         for c in value.as_bytes().iter() {
@@ -81,7 +84,6 @@ impl<const LEN: usize> TryFrom<&str> for GeoHash<LEN> {
         }
 
         let mut arr = [0u8; LEN];
-        // if all values are a valid hash, we can be sure that one character is only one byte
         arr.clone_from_slice(value.as_bytes());
 
         Ok(GeoHash(arr))
