@@ -1,5 +1,5 @@
-use fixed::types::I64F64;
 use crate::GeoHash;
+use fixed::types::I64F64;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Neighbors<const T: usize> {

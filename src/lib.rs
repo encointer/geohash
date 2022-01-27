@@ -34,22 +34,20 @@
 extern crate alloc;
 
 use ::core::ops::Deref;
-use core::convert::TryFrom;
 use codec::{Decode, Encode, MaxEncodedLen};
+use core::convert::TryFrom;
 use fixed::types::I64F64;
 
 pub use crate::error::GeohashError;
 pub use crate::neighbors::{Direction, Neighbors};
 
 #[derive(Debug)]
-struct Coordinate
-{
+struct Coordinate {
     pub lon: I64F64,
     pub lat: I64F64,
 }
 
-struct Rectangle
-{
+struct Rectangle {
     min: Coordinate,
     max: Coordinate,
 }
@@ -59,7 +57,18 @@ static BASE32_CODES: &[char] = &[
     'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 ];
 
-#[derive(Encode, Decode, Eq, PartialEq, Clone, Debug, Ord, PartialOrd, scale_info::TypeInfo, MaxEncodedLen)]
+#[derive(
+    Encode,
+    Decode,
+    Eq,
+    PartialEq,
+    Clone,
+    Debug,
+    Ord,
+    PartialOrd,
+    scale_info::TypeInfo,
+    MaxEncodedLen,
+)]
 pub struct GeoHash<const LEN: usize>(pub [u8; LEN]);
 
 impl<const LEN: usize> Deref for GeoHash<LEN> {
@@ -337,8 +346,8 @@ impl<const LEN: usize> GeoHash<LEN> {
     pub fn neighbors(&self) -> Result<Neighbors<LEN>, GeohashError> {
         Ok(Neighbors {
             sw: self.neighbor(Direction::SW)?,
-            s: self.neighbor( Direction::S)?,
-            se: self.neighbor( Direction::SE)?,
+            s: self.neighbor(Direction::S)?,
+            se: self.neighbor(Direction::SE)?,
             w: self.neighbor(Direction::W)?,
             e: self.neighbor(Direction::E)?,
             nw: self.neighbor(Direction::NW)?,
