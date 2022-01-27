@@ -113,7 +113,7 @@ impl<const LEN: usize> GeoHash<LEN> {
         }
 
         let two = I64F64::from_num(2);
-        for i in 0..out.len() {
+        for byte in &mut out {
             for _ in 0..5 {
                 if bits_total % 2 == 0 {
                     let mid = (max_lon + min_lon) / two;
@@ -138,7 +138,7 @@ impl<const LEN: usize> GeoHash<LEN> {
             }
 
             let code: char = BASE32_CODES[hash_value];
-            out[i] = code as u8;
+            *byte = code as u8;
             hash_value = 0;
         }
         Ok(GeoHash(out))
