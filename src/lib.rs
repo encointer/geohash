@@ -67,7 +67,7 @@ static BASE32_CODES: &[char] = &[
     scale_info::TypeInfo,
     MaxEncodedLen,
 )]
-pub struct GeoHash<const LEN: usize>(pub [u8; LEN]);
+pub struct GeoHash<const LEN: usize>([u8; LEN]);
 
 impl<const LEN: usize> GeoHash<LEN> {
     /// Internal function to encode a coordinate to a geohash with length `LEN`.

@@ -54,3 +54,16 @@ impl<const LEN: usize> TryFrom<&[u8]> for GeoHash<LEN> {
         Ok(GeoHash(arr))
     }
 }
+
+impl<const LEN: usize> Into<[u8; LEN]> for GeoHash<LEN> {
+    fn into(self) -> [u8; LEN] {
+        self.0
+    }
+}
+
+impl<const LEN: usize> Into<String> for GeoHash<LEN> {
+    fn into(self) -> String {
+        String::from_utf8(self.0.to_vec())
+            .expect("Geohash can only be constructed from a subset of utf8-strings; qed")
+    }
+}
