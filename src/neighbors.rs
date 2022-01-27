@@ -2,15 +2,15 @@ use crate::GeoHash;
 use fixed::types::I64F64;
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct Neighbors<const T: usize> {
-    pub sw: GeoHash<T>,
-    pub s: GeoHash<T>,
-    pub se: GeoHash<T>,
-    pub w: GeoHash<T>,
-    pub e: GeoHash<T>,
-    pub nw: GeoHash<T>,
-    pub n: GeoHash<T>,
-    pub ne: GeoHash<T>,
+pub struct Neighbors<const LEN: usize> {
+    pub sw: GeoHash<LEN>,
+    pub s: GeoHash<LEN>,
+    pub se: GeoHash<LEN>,
+    pub w: GeoHash<LEN>,
+    pub e: GeoHash<LEN>,
+    pub nw: GeoHash<LEN>,
+    pub n: GeoHash<LEN>,
+    pub ne: GeoHash<LEN>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
