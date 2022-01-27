@@ -72,10 +72,10 @@ static BASE32_CODES: &[char] = &[
 pub struct GeoHash<const LEN: usize>(pub [u8; LEN]);
 
 impl<const LEN: usize> Deref for GeoHash<LEN> {
-    type Target = [u8];
+    type Target = [u8; LEN];
 
     fn deref(&self) -> &Self::Target {
-        &self.0[..]
+        &self.0
     }
 }
 
