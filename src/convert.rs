@@ -38,7 +38,7 @@ impl<const LEN: usize> TryFrom<&[u8]> for GeoHash<LEN> {
     type Error = GeohashError;
 
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
-        // `try_from` is only successful if the input is a valid base 32 encoded geo hash.
+        // `try_from` is only successful if the input is a valid base 32 encoded geo hash of length `LEN`
 
         if value.len() != LEN {
             return Err(GeohashError::InvalidLen);
