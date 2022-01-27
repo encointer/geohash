@@ -18,10 +18,10 @@
 //!   let lat = I64F64::from_num(37.8324f64);
 //!
 //!   // decode a geohash
-//!   let (lon, lat, _, _) = GeoHash::try_from("ww8p1r4t8")?.try_as_coordinates()?;
+//!   let (lon, lat, _, _) = GeoHash::<9>::try_from("ww8p1r4t8")?.try_as_coordinates()?;
 //!
 //!   // find a neighboring hash
-//!   let sw = GeoHash::try_from("ww8p1r4t8")?.neighbor(Direction::SW)?;
+//!   let sw = GeoHash::<9>::try_from("ww8p1r4t8")?.neighbor(Direction::SW)?;
 //!
 //!   Ok(())
 //! }
@@ -120,8 +120,8 @@ impl<const LEN: usize> GeoHash<LEN> {
     /// use geohash::GeoHash;
     /// let lon = I64F64::from_num(-120.6623);
     /// let lat = I64F64::from_num(35.3003);
-    /// let geohash_string = GeoHash::try_from_params(lat, lon).expect("Invalid coordinate");
-    /// assert_eq!(geohash_string, GeoHash::try_from("9q60y").unwrap());
+    /// let geohash_string = GeoHash::<5>::try_from_params(lat, lon).expect("Invalid coordinate");
+    /// assert_eq!(geohash_string, GeoHash::<5>::try_from("9q60y").unwrap());
     /// ```
     ///
     /// Encoding a coordinate to a length ten geohash:
@@ -132,9 +132,9 @@ impl<const LEN: usize> GeoHash<LEN> {
     /// use geohash::GeoHash;
     /// let lon = I64F64::from_num(-120.6623);
     /// let lat = I64F64::from_num(35.3003);
-    /// let geohash_string = GeoHash::try_from_params(lat, lon).expect("Invalid coordinate");
+    /// let geohash_string = GeoHash::<10>::try_from_params(lat, lon).expect("Invalid coordinate");
     ///
-    /// assert_eq!(geohash_string, GeoHash::try_from("9q60y60rhs").unwrap());
+    /// assert_eq!(geohash_string, GeoHash::<10>::try_from("9q60y60rhs").unwrap());
     /// ```
     pub fn try_from_params(lat: I64F64, lon: I64F64) -> Result<GeoHash<LEN>, GeohashError> {
         let mut out = [0u8; LEN];
@@ -254,7 +254,7 @@ impl<const LEN: usize> GeoHash<LEN> {
     /// use std::convert::TryFrom;
     /// use fixed::types::I64F64;
     /// use geohash::GeoHash;
-    /// let geohash_str = GeoHash::try_from("9q60y").unwrap();
+    /// let geohash_str = GeoHash::<5>::try_from("9q60y").unwrap();
     /// let decoded = geohash_str.try_as_coordinates().expect("Invalid hash string");
     /// assert_eq!(
     ///     decoded,
@@ -273,7 +273,7 @@ impl<const LEN: usize> GeoHash<LEN> {
     /// use std::convert::TryFrom;
     /// use fixed::types::I64F64;
     /// use geohash::GeoHash;
-    /// let geohash_str = GeoHash::try_from("9q60y60rhs").unwrap();
+    /// let geohash_str = GeoHash::<10>::try_from("9q60y60rhs").unwrap();
     /// let decoded = geohash_str.try_as_coordinates().expect("Invalid hash string");
     /// assert_eq!(
     ///     decoded,
@@ -315,21 +315,22 @@ impl<const LEN: usize> GeoHash<LEN> {
     /// ```
     /// use std::convert::TryFrom;
     /// use geohash::GeoHash;
-    /// let geohash_str = GeoHash::try_from("9q60y60rhs").unwrap();
+    /// type Geo10 = GeoHash<10>;
+    /// let geohash_str = Geo10::try_from("9q60y60rhs").unwrap();
     ///
     /// let neighbors = geohash_str.neighbors().expect("Invalid hash string");
     ///
     /// assert_eq!(
     ///     neighbors,
     ///     geohash::Neighbors {
-    ///         n: GeoHash::try_from("9q60y60rht").unwrap(),
-    ///         ne: GeoHash::try_from("9q60y60rhv").unwrap(),
-    ///         e: GeoHash::try_from("9q60y60rhu").unwrap(),
-    ///         se: GeoHash::try_from("9q60y60rhg").unwrap(),
-    ///         s: GeoHash::try_from("9q60y60rhe").unwrap(),
-    ///         sw: GeoHash::try_from("9q60y60rh7").unwrap(),
-    ///         w: GeoHash::try_from("9q60y60rhk").unwrap(),
-    ///         nw: GeoHash::try_from("9q60y60rhm").unwrap(),
+    ///         n: Geo10::try_from("9q60y60rht").unwrap(),
+    ///         ne: Geo10::try_from("9q60y60rhv").unwrap(),
+    ///         e: Geo10::try_from("9q60y60rhu").unwrap(),
+    ///         se: Geo10::try_from("9q60y60rhg").unwrap(),
+    ///         s: Geo10::try_from("9q60y60rhe").unwrap(),
+    ///         sw: Geo10::try_from("9q60y60rh7").unwrap(),
+    ///         w: Geo10::try_from("9q60y60rhk").unwrap(),
+    ///         nw: Geo10::try_from("9q60y60rhm").unwrap(),
     ///     }
     /// );
     /// ```
