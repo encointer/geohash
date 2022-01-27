@@ -74,17 +74,26 @@ impl<const LEN: usize> TryFrom<&str> for GeoHash<LEN> {
     type Error = GeohashError;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
+        TryFrom::<&[u8]>::try_from(value.as_bytes())
+    }
+}
+
+impl<const LEN: usize> TryFrom<&[u8]> for GeoHash<LEN> {
+    type Error = GeohashError;
+
+    fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
+        // `try_from` is only successful if the input is a valid base 32 encoded geo hash.
+
         if value.len() != LEN {
             return Err(GeohashError::InvalidLen);
         }
-        // `try_from` is only successful if the input is a valid base 32 encoded geo hash.
 
-        for c in value.as_bytes().iter() {
+        for c in value.iter() {
             let _ = hash_value_of_char(*c as char)?;
         }
 
         let mut arr = [0u8; LEN];
-        arr.clone_from_slice(value.as_bytes());
+        arr.clone_from_slice(value);
 
         Ok(GeoHash(arr))
     }
