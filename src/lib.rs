@@ -78,6 +78,14 @@ impl<const LEN: usize> TryFrom<&str> for GeoHash<LEN> {
     }
 }
 
+impl<const LEN: usize> TryFrom<[u8; LEN]> for GeoHash<LEN> {
+    type Error = GeohashError;
+
+    fn try_from(value: [u8; LEN]) -> Result<Self, Self::Error> {
+        TryFrom::<&[u8]>::try_from(&value[..])
+    }
+}
+
 impl<const LEN: usize> TryFrom<&[u8]> for GeoHash<LEN> {
     type Error = GeohashError;
 
