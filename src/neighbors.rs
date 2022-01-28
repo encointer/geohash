@@ -1,16 +1,16 @@
-use fixed::types::I64F64;
 use crate::GeoHash;
+use fixed::types::I64F64;
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct Neighbors {
-    pub sw: GeoHash,
-    pub s: GeoHash,
-    pub se: GeoHash,
-    pub w: GeoHash,
-    pub e: GeoHash,
-    pub nw: GeoHash,
-    pub n: GeoHash,
-    pub ne: GeoHash,
+pub struct Neighbors<const LEN: usize> {
+    pub sw: GeoHash<LEN>,
+    pub s: GeoHash<LEN>,
+    pub se: GeoHash<LEN>,
+    pub w: GeoHash<LEN>,
+    pub e: GeoHash<LEN>,
+    pub nw: GeoHash<LEN>,
+    pub n: GeoHash<LEN>,
+    pub ne: GeoHash<LEN>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -19,7 +19,7 @@ pub enum Direction {
     N,
     /// North-east
     NE,
-    /// Eeast
+    /// East
     E,
     /// South-east
     SE,

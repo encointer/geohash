@@ -12,15 +12,16 @@
 //! use fixed::types::I64F64;
 //!
 //! fn main() -> Result<(), Box<geohash::GeohashError>> {
+//! use std::convert::TryFrom;
 //! use geohash::{GeoHash, Direction};
 //! let lon = I64F64::from_num(112.5584);
 //!   let lat = I64F64::from_num(37.8324f64);
 //!
 //!   // decode a geohash
-//!   let (lon, lat, _, _) = GeoHash::from("ww8p1r4t8").try_as_coordinates()?;
+//!   let (lon, lat, _, _) = GeoHash::<9>::try_from("ww8p1r4t8")?.try_as_coordinates()?;
 //!
 //!   // find a neighboring hash
-//!   let sw = GeoHash::from("ww8p1r4t8").neighbor(Direction::SW)?;
+//!   let sw = GeoHash::<9>::try_from("ww8p1r4t8")?.neighbor(Direction::SW)?;
 //!
 //!   Ok(())
 //! }
@@ -32,24 +33,19 @@
 
 extern crate alloc;
 
-use ::core::ops::Deref;
-use alloc::vec::Vec;
-
-use codec::{Decode, Encode};
+use codec::{Decode, Encode, MaxEncodedLen};
 use fixed::types::I64F64;
 
 pub use crate::error::GeohashError;
 pub use crate::neighbors::{Direction, Neighbors};
 
 #[derive(Debug)]
-struct Coordinate
-{
+struct Coordinate {
     pub lon: I64F64,
     pub lat: I64F64,
 }
 
-struct Rectangle
-{
+struct Rectangle {
     min: Coordinate,
     max: Coordinate,
 }
@@ -59,52 +55,51 @@ static BASE32_CODES: &[char] = &[
     'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 ];
 
-#[derive(Encode, Decode, Eq, PartialEq, Clone, Debug, Ord, PartialOrd, scale_info::TypeInfo)]
-pub struct GeoHash(pub Vec<u8>);
+#[derive(
+    Encode,
+    Decode,
+    Eq,
+    PartialEq,
+    Clone,
+    Debug,
+    Ord,
+    PartialOrd,
+    scale_info::TypeInfo,
+    MaxEncodedLen,
+)]
+pub struct GeoHash<const LEN: usize>([u8; LEN]);
 
-impl Deref for GeoHash {
-    type Target = Vec<u8>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl From<&str> for GeoHash {
-    fn from(s: &str) -> Self {
-        GeoHash(s.as_bytes().to_vec())
-    }
-}
-
-impl GeoHash {
-    /// Internal function to encode a coordinate to a geohash with length `len`.
+impl<const LEN: usize> GeoHash<LEN> {
+    /// Internal function to encode a coordinate to a geohash with length `LEN`.
     ///
     /// ### Examples
     ///
     /// Encoding a coordinate to a length five geohash:
     ///
     /// ```rust
+    /// use std::convert::TryFrom;
     /// use fixed::types::I64F64;
     /// use geohash::GeoHash;
     /// let lon = I64F64::from_num(-120.6623);
     /// let lat = I64F64::from_num(35.3003);
-    /// let geohash_string = GeoHash::try_from_params(lat, lon, 5).expect("Invalid coordinate");
-    /// assert_eq!(geohash_string, GeoHash::from("9q60y"));
+    /// let geohash_string = GeoHash::<5>::try_from_params(lat, lon).expect("Invalid coordinate");
+    /// assert_eq!(geohash_string, GeoHash::<5>::try_from("9q60y").unwrap());
     /// ```
     ///
     /// Encoding a coordinate to a length ten geohash:
     ///
     /// ```rust
+    /// use std::convert::TryFrom;
     /// use fixed::types::I64F64;
     /// use geohash::GeoHash;
     /// let lon = I64F64::from_num(-120.6623);
     /// let lat = I64F64::from_num(35.3003);
-    /// let geohash_string = GeoHash::try_from_params(lat, lon, 10).expect("Invalid coordinate");
+    /// let geohash_string = GeoHash::<10>::try_from_params(lat, lon).expect("Invalid coordinate");
     ///
-    /// assert_eq!(geohash_string, GeoHash::from("9q60y60rhs"));
+    /// assert_eq!(geohash_string, GeoHash::<10>::try_from("9q60y60rhs").unwrap());
     /// ```
-    pub fn try_from_params(lat: I64F64, lon: I64F64, len: usize) -> Result<GeoHash, GeohashError> {
-        let mut out = Vec::with_capacity(len);
+    pub fn try_from_params(lat: I64F64, lon: I64F64) -> Result<GeoHash<LEN>, GeohashError> {
+        let mut out = [0u8; LEN];
 
         let mut bits_total: i8 = 0;
         let mut hash_value: usize = 0;
@@ -118,7 +113,7 @@ impl GeoHash {
         }
 
         let two = I64F64::from_num(2);
-        while out.len() < len {
+        for byte in &mut out {
             for _ in 0..5 {
                 if bits_total % 2 == 0 {
                     let mid = (max_lon + min_lon) / two;
@@ -143,7 +138,7 @@ impl GeoHash {
             }
 
             let code: char = BASE32_CODES[hash_value];
-            out.push(code as u8);
+            *byte = code as u8;
             hash_value = 0;
         }
         Ok(GeoHash(out))
@@ -172,7 +167,7 @@ impl GeoHash {
         let two = I64F64::from_num(2);
 
         for c in self.iter() {
-            hash_value = GeoHash::hash_value_of_char(*c as char)?;
+            hash_value = hash_value_of_char(*c as char)?;
 
             for bs in 0..5 {
                 let bit = (hash_value >> (4 - bs)) & 1usize;
@@ -209,22 +204,6 @@ impl GeoHash {
         })
     }
 
-    fn hash_value_of_char(c: char) -> Result<usize, GeohashError> {
-        let ord = c as usize;
-        if (48..=57).contains(&ord) {
-            return Ok(ord - 48);
-        } else if (98..=104).contains(&ord) {
-            return Ok(ord - 88);
-        } else if (106..=107).contains(&ord) {
-            return Ok(ord - 89);
-        } else if (109..=110).contains(&ord) {
-            return Ok(ord - 90);
-        } else if (112..=122).contains(&ord) {
-            return Ok(ord - 91);
-        }
-        Err(GeohashError::InvalidHashCharacter(c))
-    }
-
     /// Internal function to decode a geohash into a longitude/latitude pair with some
     /// longitude/latitude error. The return value is
     /// `(<longitude>, <latitude>, <longitude error>, <latitude error>)`.
@@ -234,9 +213,10 @@ impl GeoHash {
     /// Decoding a length five geohash:
     ///
     /// ```rust
+    /// use std::convert::TryFrom;
     /// use fixed::types::I64F64;
     /// use geohash::GeoHash;
-    /// let geohash_str = GeoHash::from("9q60y");
+    /// let geohash_str = GeoHash::<5>::try_from("9q60y").unwrap();
     /// let decoded = geohash_str.try_as_coordinates().expect("Invalid hash string");
     /// assert_eq!(
     ///     decoded,
@@ -252,9 +232,10 @@ impl GeoHash {
     /// Decoding a length ten geohash:
     ///
     /// ```rust
+    /// use std::convert::TryFrom;
     /// use fixed::types::I64F64;
     /// use geohash::GeoHash;
-    /// let geohash_str = GeoHash::from("9q60y60rhs");
+    /// let geohash_str = GeoHash::<10>::try_from("9q60y60rhs").unwrap();
     /// let decoded = geohash_str.try_as_coordinates().expect("Invalid hash string");
     /// assert_eq!(
     ///     decoded,
@@ -280,13 +261,13 @@ impl GeoHash {
     }
 
     /// Find neighboring geohashes for the given geohash and direction.
-    pub fn neighbor(&self, direction: Direction) -> Result<GeoHash, GeohashError> {
+    pub fn neighbor(&self, direction: Direction) -> Result<GeoHash<LEN>, GeohashError> {
         let (lon, lat, lon_err, lat_err) = self.try_as_coordinates()?;
         let (dlat, dlng) = direction.to_tuple();
         let two = I64F64::from_num(2);
         let neighbor_lon = lon + two * lon_err.abs() * dlng;
         let neighbor_lat = lat + two * lat_err.abs() * dlat;
-        GeoHash::try_from_params(neighbor_lat, neighbor_lon, self.len())
+        GeoHash::try_from_params(neighbor_lat, neighbor_lon)
     }
 
     /// Find all neighboring geohashes for the given geohash.
@@ -294,30 +275,32 @@ impl GeoHash {
     /// ### Examples
     ///
     /// ```
+    /// use std::convert::TryFrom;
     /// use geohash::GeoHash;
-    /// let geohash_str = GeoHash::from("9q60y60rhs");
+    /// type Geo10 = GeoHash<10>;
+    /// let geohash_str = Geo10::try_from("9q60y60rhs").unwrap();
     ///
     /// let neighbors = geohash_str.neighbors().expect("Invalid hash string");
     ///
     /// assert_eq!(
     ///     neighbors,
     ///     geohash::Neighbors {
-    ///         n: GeoHash::from("9q60y60rht"),
-    ///         ne: GeoHash::from("9q60y60rhv"),
-    ///         e: GeoHash::from("9q60y60rhu"),
-    ///         se: GeoHash::from("9q60y60rhg"),
-    ///         s: GeoHash::from("9q60y60rhe"),
-    ///         sw: GeoHash::from("9q60y60rh7"),
-    ///         w: GeoHash::from("9q60y60rhk"),
-    ///         nw: GeoHash::from("9q60y60rhm"),
+    ///         n: Geo10::try_from("9q60y60rht").unwrap(),
+    ///         ne: Geo10::try_from("9q60y60rhv").unwrap(),
+    ///         e: Geo10::try_from("9q60y60rhu").unwrap(),
+    ///         se: Geo10::try_from("9q60y60rhg").unwrap(),
+    ///         s: Geo10::try_from("9q60y60rhe").unwrap(),
+    ///         sw: Geo10::try_from("9q60y60rh7").unwrap(),
+    ///         w: Geo10::try_from("9q60y60rhk").unwrap(),
+    ///         nw: Geo10::try_from("9q60y60rhm").unwrap(),
     ///     }
     /// );
     /// ```
-    pub fn neighbors(&self) -> Result<Neighbors, GeohashError> {
+    pub fn neighbors(&self) -> Result<Neighbors<LEN>, GeohashError> {
         Ok(Neighbors {
             sw: self.neighbor(Direction::SW)?,
-            s: self.neighbor( Direction::S)?,
-            se: self.neighbor( Direction::SE)?,
+            s: self.neighbor(Direction::S)?,
+            se: self.neighbor(Direction::SE)?,
             w: self.neighbor(Direction::W)?,
             e: self.neighbor(Direction::E)?,
             nw: self.neighbor(Direction::NW)?,
@@ -327,5 +310,22 @@ impl GeoHash {
     }
 }
 
+fn hash_value_of_char(c: char) -> Result<usize, GeohashError> {
+    let ord = c as usize;
+    if (48..=57).contains(&ord) {
+        return Ok(ord - 48);
+    } else if (98..=104).contains(&ord) {
+        return Ok(ord - 88);
+    } else if (106..=107).contains(&ord) {
+        return Ok(ord - 89);
+    } else if (109..=110).contains(&ord) {
+        return Ok(ord - 90);
+    } else if (112..=122).contains(&ord) {
+        return Ok(ord - 91);
+    }
+    Err(GeohashError::InvalidHashCharacter(c))
+}
+
+mod convert;
 mod error;
 mod neighbors;
