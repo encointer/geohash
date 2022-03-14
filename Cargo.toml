@@ -13,5 +13,5 @@ edition = "2018"
 
 [dependencies]
 codec = { package = "parity-scale-codec", version = "2.3.1", default-features = false, features = ["derive", "max-encoded-len"] }
-fixed = { package = "substrate-fixed", tag = "v0.5.8", default-features = false, git = "https://github.com/encointer/substrate-fixed" }
+fixed = { package = "substrate-fixed", branch = "polkadot-v0.9.17", default-features = false, git = "https://github.com/encointer/substrate-fixed" }
 scale-info = { version = "1.0.0", default-features = false, features = ["derive"] }
