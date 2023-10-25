@@ -1,9 +1,10 @@
-# Rust-Geohash
+[![crates.io](https://img.shields.io/crates/v/substrate-geohash.svg)](https://crates.io/crates/substrate-geohash)
+
+# Rust-Geohash for Substrate
+
+**This is a fork which derives SCALE codec info for use with parity substrate** 
 
 Rust-Geohash is a Rust library for Geohash algorithm. Ported from [node-geohash](http://github.com/sunng87/node-geohash) module.
-
-[![Build Status](https://travis-ci.org/georust/geohash.svg)](https://travis-ci.org/georust/geohash)
-[![](http://meritbadge.herokuapp.com/geohash)](https://crates.io/crates/geohash)
 
 [Documentation](https://docs.rs/geohash/)
 

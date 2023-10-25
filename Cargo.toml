@@ -1,17 +1,24 @@
 [package]
-
-name = "geohash"
+name = "substrate-geohash"
 version = "0.13.0"
-authors = [ "Ning Sun <sunng@about.me>" ]
-description = "Geohash implementation for Rust."
+authors = [
+  "Ning Sun <sunng@about.me>",
+  "Encointer Association <info@encointer.org>",
+]
+description = "Geohash implementation for Rust. Forked for use with substrate"
 license = "MIT/Apache-2.0"
 keywords = ["geohash", "gis", "geography"]
-repository = "https://github.com/georust/geohash.rs"
+repository = "https://github.com/encointer/geohash"
 readme = "README.md"
 documentation = "https://docs.rs/geohash/"
 edition = "2018"
 
 [dependencies]
-codec = { package = "parity-scale-codec", version = "3.6.1", default-features = false, features = ["derive", "max-encoded-len"] }
-fixed = { package = "substrate-fixed", tag = "polkadot-v1.0.0", default-features = false, git = "https://github.com/encointer/substrate-fixed" }
-scale-info = { version = "2.5.0", default-features = false, features = ["derive"] }
+codec = { package = "parity-scale-codec", version = "3.6.1", default-features = false, features = [
+  "derive",
+  "max-encoded-len",
+] }
+fixed = { package = "substrate-fixed", version = "0.5.9" }
+scale-info = { version = "2.5.0", default-features = false, features = [
+  "derive",
+] }
