@@ -18,10 +18,11 @@ codec = { package = "parity-scale-codec", version = "3.7.4", default-features = 
   "derive",
   "max-encoded-len",
 ] }
-fixed = { package = "substrate-fixed", version = "0.5.9" }
+fixed = { package = "substrate-fixed", version = "0.6.0" }
 scale-info = { version = "2.11.6", default-features = false, features = [
   "derive",
 ] }
 
-[patch.crates-io]
-substrate-fixed = { path = "../substrate-fixed"}
+#[patch.crates-io]
+#substrate-fixed = { path = "../substrate-fixed"}
+#substrate-typenum = { path = "../typenum"}
