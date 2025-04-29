@@ -1,6 +1,6 @@
 [package]
 name = "substrate-geohash"
-version = "0.13.0"
+version = "0.14.0"
 authors = [
   "Ning Sun <sunng@about.me>",
   "Encointer Association <info@encointer.org>",
