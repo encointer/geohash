@@ -33,7 +33,7 @@
 
 extern crate alloc;
 
-use codec::{Decode, Encode, MaxEncodedLen};
+use codec::{Decode, DecodeWithMemTracking, Encode, MaxEncodedLen};
 use fixed::types::I64F64;
 
 pub use crate::error::GeohashError;
@@ -58,6 +58,7 @@ static BASE32_CODES: &[char] = &[
 #[derive(
     Encode,
     Decode,
+    DecodeWithMemTracking,
     Eq,
     PartialEq,
     Clone,
